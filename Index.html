@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Plant Watering App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+</head>
+
+<body style="font-family: Arial; text-align: center; padding: 20px;">
+  <h2>🌱 Plant Watering App</h2>
+
+  <button onclick="pumpOn()" style="padding:15px; margin:10px;">Pump ON</button>
+  <button onclick="pumpOff()" style="padding:15px; margin:10px;">Pump OFF</button>
+
+  <p>Soil Moisture:</p>
+  <h3 id="soil">---</h3>
+
+<script>
+  const client = mqtt.connect(
+    "wss://58212caad356447888c702de7b0cc94f.s1.eu.hivemq.cloud:8884/mqtt",
+    {
+      username: "Esp32",
+      password: "Esp32101"
+    }
+  );
+
+  client.on("connect", function () {
+    console.log("Connected to HiveMQ");
+    client.subscribe("plant/soil");
+  });
+
+  client.on("message", function (topic, message) {
+    if (topic === "plant/soil") {
+      document.getElementById("soil").innerText = message.toString();
+    }
+  });
+
+  function pumpOn() {
+    client.publish("plant/pump", "ON");
+  }
+
+  function pumpOff() {
+    client.publish("plant/pump", "OFF");
+  }
+</script>
+
+</body>
+</html>
